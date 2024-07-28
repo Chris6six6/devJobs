@@ -48,8 +48,17 @@ exports.crearUsuario = async (req, res, next) => {
     }
 };
 
+// Formulario para iniciar sesion
 exports.formIniciarSesion = (req, res) => {
     res.render('Iniciar-sesion', { 
         nombrePagina: 'Iniciar sesion devJobs'
+    })
+}
+
+// Form editar el perfil
+exports.formEditarPerfil = (req, res) => {
+    res.render('editar-perfil', {
+        nombrePagina: 'Editar tu perfil en devJobs',
+        usuario: req.user
     })
 }
