@@ -14,7 +14,7 @@ async(email, password, done) => {
     });
 
     // El usuario existente, vamos a verificarlo
-    const verificarPass = usuario.comparePassword(password);
+    const verificarPass = usuario.compararPassword(password);
     if(!verificarPass) return done(null, false, {
         message: 'Password incorrecto'
     });

@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
 const Vacante = mongoose.model('Vacante');
+const { body, validationResult } = require('express-validator');
 
 exports.formularioNuevaVacante = (req, res) => {
     res.render('nueva-vacante', {
         nombrePagina: 'Nueva vacante',
-        tagLine: 'Llena el formulario y publica tu vacante'
+        tagLine: 'Llena el formulario y publica tu vacante',
+        cerrarSesion: true,
+        nombre: req.user.nombre,
     });
 };
 
@@ -55,7 +58,9 @@ exports.formEditarVacante = async(req, res, next) => {
 
     res.render('editar-vacante', {
         vacante,
-        nombrePagina: `Editar - ${vacante.titulo}`
+        nombrePagina: `Editar - ${vacante.titulo}`,
+        cerrarSesion: true,
+        nombre: req.user.nombre,
     })
 }
 
@@ -74,3 +79,31 @@ exports.editarVacante = async(req, res) => {
     res.redirect(`/vacantes/${vacante.url}`);
 
 }
+
+exports.validarVacante = [
+    // Sanitizar and Validar
+    body('titulo').trim().escape().notEmpty().withMessage('Agraga un titulo a la vanacte'),
+    body('empresa').trim().escape().notEmpty().withMessage('Agrega una empresa'),
+    body('ubicacion').trim().escape().notEmpty().withMessage('Agrega una ubicacion'),
+    body('contrato').trim().escape().notEmpty().withMessage('Selecciona un tipo de contrato'),
+    body('skills').trim().escape().notEmpty().withMessage('Selecciona al menos una skill'),
+
+    (req, res, next) => {
+    
+    const errores = validationResult(req);
+
+    if (!errores.isEmpty()) {
+        // Recargar la vista con los errores
+        req.flash('error', errores.array().map(error => error.msg));
+
+        return res.render('nueva-vacante', {
+            nombrePagina: 'Nueva vacante',
+            tagLine: 'Llena el formulario y publica tu vacante',
+            cerrarSesion: true,
+            nombre: req.user.nombre,
+            mensajes: req.flash()
+        });
+    }
+
+    next();
+}];
