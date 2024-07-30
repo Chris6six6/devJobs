@@ -107,3 +107,31 @@ exports.validarVacante = [
 
     next();
 }];
+
+exports.eliminarVacante = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const vacante = await Vacante.findById(id);
+
+        if (!vacante) {
+            return res.status(404).send('Vacante no encontrada');
+        }
+
+        if (verificarAutor(vacante, req.user)) {
+            // Si este es el usuario, se puede eliminar
+            await vacante.deleteOne();
+            return res.status(200).send('Vacante eliminada correctamente');
+        } else {
+            // No permitido
+            return res.status(403).send('No tienes permiso para eliminar esta vacante');
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error interno del servidor');
+    }
+};
+
+const verificarAutor = (vacante = {}, usuario = {}) => {
+    return vacante.autor.equals(usuario._id);
+};
