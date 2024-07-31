@@ -1,6 +1,57 @@
 const mongoose = require('mongoose');
 const { check, body, validationResult } = require('express-validator');
 const Usuarios = mongoose.model('Usuarios');
+const multer = require('multer');
+const shortid = require('shortid');
+const path = require('path');
+
+exports.subirImagen = (req, res, next) => {
+    upload(req, res, function(error) {
+        if (error) {
+            if(error instanceof multer.MulterError) {
+                if(error.code === 'LIMIT_FILE_SIZE') {
+                    req.flash('error', 'El archivo es mayor a 100kb');
+                }
+                else {
+                    req.flash('error', error.message);
+                }
+            }
+            else {
+                req.flash('error', error.message);
+            }
+            res.redirect('/administracion');
+            return;
+        }
+        else {
+            return next();
+        }
+    });
+
+}
+
+// Opciones de multer
+const configuracionMulter = {
+    limits: { fileSize: 1000000 },
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, path.join(__dirname, '../public/uploads/perfiles'));
+        },
+        filename: (req, file, cb) => {
+            const extension = file.mimetype.split('/')[1];
+            cb(null, `${shortid.generate()}.${extension}`);
+        }
+    }),
+    fileFilter(req, file, cb) {
+        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+            // El callback se ejecuta como true cuando la imagen es aceptada
+            cb(null, true);
+        } else {
+            cb(new Error('Formato no válido'), false);
+        }
+    }
+}
+
+const upload = multer(configuracionMulter).single('imagen');
 
 exports.formCrearCuenta = (req, res) => {
     res.render('crear-cuenta', {
@@ -89,6 +140,7 @@ exports.formEditarPerfil = (req, res) => {
         usuario: req.user,
         cerrarSesion: true,
         nombre: req.user.nombre,
+        imagen: req.user.imagen
     })
 }
 
@@ -102,6 +154,11 @@ exports.editarPerfil = async(req, res) => {
     if(req.body.password) {
         usuario.password = req.body.password;
     }
+
+    if(req.file) {
+        usuario.imagen = req.file.filename;
+    }
+
     await usuario.save();
 
     // Alerta
@@ -128,6 +185,7 @@ exports.validarPerfil = async (req, res, next) => {
             usuario: req.user.toObject(),
             cerrarSesion: true,
             nombre: req.user.nombre,
+            imagen: req.user.imagen,
             mensajes: req.flash()
         })
         return;

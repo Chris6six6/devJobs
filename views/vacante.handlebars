@@ -23,8 +23,10 @@
         <div class="vacante-descripcion">
             {{{vacante.descripcion}}}
         </div>
-
-        <a href="/vacantes/editar/{{vacante.url}}" class="btn btn-azul editar-btn">Editar vacante</a>
+        
+        {{#if esAutor}}
+            <a href="/vacantes/editar/{{vacante.url}}" class="btn btn-azul editar-btn">Editar vacante</a>
+        {{/if}}
 
     </main>
     <aside class="sidebar">
@@ -35,4 +37,21 @@
             {{/each}}
         </ul>
     </aside>
+</div>
+
+<div class="contenedor datos-reclutador">
+    <div class="enviar-datos">
+
+    </div>
+
+    <div class="info-reclutador">
+        <h2>Informacion reclutador</h2>
+        {{#if vacante.autor.nombre}}
+            <p>{{vacante.autor.nombre}}</p>
+        {{/if}}
+
+        {{#if vacante.autor.imagen}}
+            <img src="/uploads/perfiles/{{vacante.autor.imagen}}">
+        {{/if}}
+    </div>
 </div>

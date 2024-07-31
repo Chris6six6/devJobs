@@ -8,6 +8,7 @@ exports.formularioNuevaVacante = (req, res) => {
         tagLine: 'Llena el formulario y publica tu vacante',
         cerrarSesion: true,
         nombre: req.user.nombre,
+        imagen: req.user.imagen
     });
 };
 
@@ -35,21 +36,26 @@ exports.agregarVacante = async (req, res) => {
 
 exports.mostrarVacante = async (req, res, next) => {
     try {
-        const vacante = await Vacante.findOne({ url: req.params.url });
+        const vacante = await Vacante.findOne({ url: req.params.url }).populate('autor');
 
         // Si no hay resultados
         if (!vacante) return next();
 
+        // Comprobar si el usuario actual es el autor de la vacante
+        const esAutor = req.user && vacante.autor._id.toString() === req.user._id.toString();
+
         res.render('vacante', {
             vacante,
             nombrePagina: vacante.titulo,
-            barra: true
+            barra: true,
+            esAutor // Pasar esta variable a la vista
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Hubo un error al mostrar la vacante');
     }
 };
+
 
 exports.formEditarVacante = async(req, res, next) => {
     const vacante = await Vacante.findOne({ url: req.params.url });
@@ -61,6 +67,7 @@ exports.formEditarVacante = async(req, res, next) => {
         nombrePagina: `Editar - ${vacante.titulo}`,
         cerrarSesion: true,
         nombre: req.user.nombre,
+        imagen: req.user.imagen
     })
 }
 
