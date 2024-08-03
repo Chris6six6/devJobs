@@ -35,6 +35,9 @@ const hbs = exphbs.create({
     }
 });
 
+// Configurar el directorio de vistas
+app.set('views', path.join(__dirname, 'views'));
+
 // Habilitar Handlebars como view engine
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
