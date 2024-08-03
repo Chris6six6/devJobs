@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-require('./config/db.js');
+require('./config/db'); // Configuración de la base de datos
 
 const express = require('express');
 const exphbs = require('express-handlebars');
@@ -21,11 +21,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Validacion de campos
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Configurar Handlebars para permitir el acceso a propiedades del prototipo
+// Configurar Handlebars
 const hbs = exphbs.create({
     defaultLayout: 'layout',
     helpers: require('./helpers/handlebars'),
@@ -47,6 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cookieParser());
 
+// Configurar sesión
 app.use(session({
     secret: process.env.SECRETO,
     resave: false,
@@ -57,36 +54,35 @@ app.use(session({
     })
 }));
 
-// Inicializar passport
+// Inicializar Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Alertas y flash messages
+// Flash messages
 app.use(flash());
 
-// Crear nuestro middleware
+// Middleware para mensajes
 app.use((req, res, next) => {
     res.locals.mensajes = req.flash();
     next();
 });
 
+// Rutas
 app.use('/', router());
 
-// 404 Pagina no encontrada
+// 404 Página no encontrada
 app.use((req, res, next) => {
-    next(createError(404, 'No encontado'));
-})
+    next(createError(404, 'No encontrado'));
+});
 
-// Administracion de los errores
+// Manejo de errores
 app.use((error, req, res, next) => {
     res.locals.mensaje = error.message;
+    res.render('error'); // Asegúrate de que la vista 'error' exista en 'views'
+});
 
-    res.render('error');
-})
-
-// Definir un puerto y arrancar el proyecto
+// Definir el puerto y arrancar el servidor
 const port = process.env.PORT || 3000;
-app.listen(port, () =>
-    {
-        console.log(`El servidor esta funcionando en el puerto: ${port}`)
-    });
+app.listen(port, () => {
+    console.log(`El servidor está funcionando en el puerto: ${port}`);
+});
