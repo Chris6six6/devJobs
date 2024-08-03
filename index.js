@@ -10,6 +10,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
+const createError = require('http-errors');
 const passport = require('./config/passport');
 
 require('dotenv').config({ path: 'variables.env' });
@@ -67,6 +68,18 @@ app.use((req, res, next) => {
 });
 
 app.use('/', router());
+
+// 404 Pagina no encontrada
+app.use((req, res, next) => {
+    next(createError(404, 'No encontado'));
+})
+
+// Administracion de los errores
+app.use((error, req, res, next) => {
+    res.locals.mensaje = error.message;
+
+    res.render('error');
+})
 
 app.listen(process.env.PUERTO, () => {
     console.log(`Servidor escuchando en el puerto ${process.env.PUERTO}`);

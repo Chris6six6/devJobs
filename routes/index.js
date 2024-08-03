@@ -47,6 +47,21 @@ module.exports = () => {
         authController.cerrarSesion
     );
 
+    // Resetaer password
+    router.get('/restablecer-password', 
+        authController.formRestablecerPassword
+    );
+    router.post('/reestablecer-password', 
+        authController.enviarToken
+    );
+    // Resetaer password (Almacenar en la BD)
+    router.get('/restablecer-password/:token', 
+        authController.reestablecerPassword
+    );
+    router.post('/restablecer-password/:token', 
+        authController.guardarPassword
+    );
+
     // Panel de administracion
     router.get('/administracion', 
         authController.verificarUsuario,
@@ -81,6 +96,9 @@ module.exports = () => {
         authController.verificarUsuario,
         vacantesController.mostrarCandidatos
     );
+
+    // Buscador de vacantes
+    router.post('/buscador', vacantesController.buscarVacantes);
 
     return router;
 }
