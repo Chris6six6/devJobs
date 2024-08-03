@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 require('dotenv').config({ path: 'variables.env' });
 
 mongoose.connect(process.env.DATABASE, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+  serverSelectionTimeoutMS: 30000, // Aumenta el tiempo de espera a 30 segundos
+  ssl: true // Asegúrate de que SSL esté habilitado
 });
 
 mongoose.connection.on('error', (error) => {
