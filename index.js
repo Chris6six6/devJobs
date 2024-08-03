@@ -81,6 +81,9 @@ app.use((error, req, res, next) => {
     res.render('error');
 })
 
-app.listen(process.env.PUERTO, () => {
-    console.log(`Servidor escuchando en el puerto ${process.env.PUERTO}`);
-});
+// Definir un puerto y arrancar el proyecto
+const port = process.env.PORT || 3000;
+app.listen(port, () =>
+    {
+        console.log(`El servidor esta funcionando en el puerto: ${port}`)
+    });
